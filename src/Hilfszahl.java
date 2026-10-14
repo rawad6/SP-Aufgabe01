@@ -3,7 +3,6 @@ public class Hilfszahl {
     public int getWert(){
         return wert;
     }
-
     public void setWert(int neuerWert) {
         wert = neuerWert;
     }
