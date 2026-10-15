@@ -1,34 +1,36 @@
+import java.util.concurrent.Semaphore;
 public class MeinThread extends Thread {
     private Hilfszahl zahl;
-    public MeinThread(String name, Hilfszahl zahl) {
+    private Semaphore semaphor;
+    public MeinThread(String name,
+                      Hilfszahl zahl,
+                      Semaphore semaphor) {
         super(name);
         this.zahl = zahl;
+        this.semaphor = semaphor;
     }
     @Override
     public void run() {
-
-        synchronized (zahl) {
-
+        boolean erhalten = false;
+        try {
+            semaphor.acquire();
+            erhalten = true;
             int alterWert = zahl.getWert();
-
             System.out.println(
-                    getName() + " before: " + alterWert
+                    getName() + " vorher: " + alterWert
             );
-
             int neuerWert = alterWert + 1;
-
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return;
-            }
-
+            Thread.sleep(100);
             zahl.setWert(neuerWert);
-
             System.out.println(
-                    getName() + " after: " + neuerWert
+                    getName() + " nachher: " + neuerWert
             );
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            if (erhalten) {
+                semaphor.release();
+            }
         }
     }
 }
